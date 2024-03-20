@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Finder</title>
+</head>
+<body>
+  <h1>Country Details</h1>
+  <form action="/getCapital" method="get">
+    <label for="countryName">Country Name:</label>
+    <input type="text" id="countryName" name="countryName" required>
+    <button type="submit">Search</button>
+  </form>
+  <div id="results"></div>
+  <script>
+    const resultsDiv = document.getElementById('results');
+
+    function displayResult(text) {
+      const paragraph = document.createElement('p');
+      paragraph.textContent = text;
+      resultsDiv.appendChild(paragraph);
+    }
+
+    function clearResults() {
+      resultsDiv.innerHTML = ''; 
+    }
+
+    const form = document.querySelector('form');
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms)); 
+    form.addEventListener('submit', async (event) => {
+      event.preventDefault(); 
+      const countryName = document.getElementById('countryName').value;
+      clearResults(); 
+
+      try {
+        const response = await fetch(`/getCapital?countryName=${countryName}`);
+        const data = await response.text();
+        const infoLines = data.split('\n');
+
+        for (const line of infoLines) {
+          displayResult(line);
+          await delay(500);
+        }
+      } catch (error) {
+        console.error(error);
+        displayResult('Error retrieving weather data');
+      }
+    });
+  </script>
+</body>
+</html>
